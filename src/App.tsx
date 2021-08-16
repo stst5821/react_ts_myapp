@@ -5,6 +5,8 @@ import { db } from "./firebase";
 import AddToPhotosIcon from "@material-ui/icons/AddToPhotos";
 import TaskItem from "./TaskItem";
 import { makeStyles } from "@material-ui/styles";
+import { auth } from "./firebase";
+import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 
 const useStyles = makeStyles({
   field: {
@@ -17,11 +19,22 @@ const useStyles = makeStyles({
   },
 });
 
-const App: React.FC = () => {
+const App: React.FC = (props: any) => {
   // firebaseから取得したdataを管理するため、useStateを定義
   const [tasks, setTasks] = useState([{ id: "", title: "" }]);
   const [input, setInput] = useState("");
   const classes = useStyles();
+
+  // Login check
+
+  useEffect(() => {
+    const unSub = auth.onAuthStateChanged((user) => {
+      !user && props.history.push("login"); // userに値が入っていなければ、loginpageに飛ばす
+    });
+    return () => unSub();
+  });
+
+  // Task一覧読み込み
 
   // pageを開いたとき、一度だけrenderingするためにuseEffectを使う
   useEffect(() => {
@@ -43,7 +56,25 @@ const App: React.FC = () => {
   return (
     <div className={styles.app__root}>
       <h1>Todo app by React</h1>
+
+      {/* Logout Button */}
+
+      <button
+        className={styles.app__logout}
+        onClick={async () => {
+          try {
+            // awaitを使うことでauth.signOutの完了を待ってから、loginに飛ばしている。
+            await auth.signOut();
+            props.history.push("login");
+          } catch (error) {
+            alert(error.message);
+          }
+        }}
+      >
+        <ExitToAppIcon />
+      </button>
       <br />
+
       {/* Task入力画面 */}
 
       <FormControl>
