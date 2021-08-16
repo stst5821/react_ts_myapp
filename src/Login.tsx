@@ -77,6 +77,7 @@ const Login: React.FC = (props: any) => {
       </Button>
       <br />
       <Typography align="center">
+        {/* clickするたびに、isLoginの値がtrueとfalseで変わる。 */}
         <span onClick={() => setIsLogin(!isLogin)}>
           {isLogin ? "Create new account ?" : "Back to login"}
         </span>
